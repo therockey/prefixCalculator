@@ -5,11 +5,14 @@ using namespace Util;
 using namespace std;
 
 bool cli(const string& command, CTree& drzewo) {
+    // String command z argmuentu zamieniamy na wektor ciągów znaków oddzielonych spacją
     vector<string> input = splitExpression(command);
+
+    // Odczytujemy, a następnie usuwamy z wektora pierwszy string i interpretujemy go jako komendę
     string instruction = input.back();
     input.pop_back();
 
-    if(instruction != "exit"){
+    if(instruction != "exit"){ // Jeśli użytkownik nie chce wyjść z programu, kontynuuj wykonywanie, w innym przypadku FALSE
         if(instruction == "enter"){
 
             if(input.empty()){
@@ -58,7 +61,7 @@ int main() {
     string input;
     CTree drzewo;
 
-
+    // Kontynuuj odczytywanie wejścia od użytkownika, dopóki metoda 'cli' odpowiedzialna za interpretację komend użytkownika nie zwróci false
     do{
         cout << "CTree>";
         input = "";

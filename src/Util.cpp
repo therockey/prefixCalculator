@@ -6,17 +6,22 @@
 using namespace std;
 
 vector<string> Util::splitExpression(const string &expression) {
-    std::vector<std::string> result;
-    std::istringstream iss(expression);
+    vector<std::string> result;
 
-    std::string token;
+    // Utworzenie strumienia formatującego dane ze stringa
+    istringstream iss(expression);
+
+    // Tymczasowa zmienna potrzebna, aby przechować następne ciągi znaków
+    string token;
+
+    // Odczytaj każdy znak ze strumienia wejścia i dodaj do wektora
     while (iss >> token) {
         result.push_back(token);
     }
 
-    // odwracamy kolejność elementów w wektorze, aby móc je potem szybko usuwać metodą pop_back();
+    // Odwracamy kolejność elementów w wektorze, aby móc je potem szybko usuwać metodą pop_back();
     if (!result.empty()) {
-        // zamiana elementów za pomocą std::swap
+        // Zamiana elementów za pomocą std::swap
         for (size_t i = 0, j = result.size() - 1; i < j; ++i, --j) {
             swap(result[i], result[j]);
         }
@@ -26,11 +31,11 @@ vector<string> Util::splitExpression(const string &expression) {
 }
 
 bool Util::isInteger(const string& str) {
-    //konwertujemy stringa z argumentu na cString, czyli taki zakończony dodatkowo Null character
+    // Konwertujemy stringa z argumentu na cString, czyli taki zakończony dodatkowo Null character
     const char* cStr = str.c_str();
     char* endPtr;
 
-    //korzystamy z metody std::strtol, która konwertuje cString na long; po próbie konwersji endPtr będzie wskazywać na pierwszy znak z cStr którego nie udało się zamienić na wartość liczbową
+    // Korzystamy z metody std::strtol, która konwertuje cString na long; po próbie konwersji endPtr będzie wskazywać na pierwszy znak cStr którego nie udało się zamienić na wartość liczbową; ostatni argmuent strtol oznacza system liczbowy w którym zapisana jest liczba w cStr
     long result = strtol(cStr, &endPtr, 10);
 
     // Sprawdzamy, czy konwersja zakończyła się na znaku Null, co oznacza, że całość string'a została poprawnie zamieniona na int
@@ -38,11 +43,11 @@ bool Util::isInteger(const string& str) {
 }
 
 int Util::stringToInt(const std::string& str) {
-    //konwertujemy stringa z argumentu na cString, czyli taki zakończony dodatkowo Null character
+    // Konwertujemy stringa z argumentu na cString, czyli taki zakończony dodatkowo Null character
     const char* cStr = str.c_str();
     char* endPtr;
 
-    //korzystamy z metody std::strtol, która konwertuje cString na long; po próbie konwersji endPtr będzie wskazywać na pierwszy znak z cStr którego nie udało się zamienić na wartość liczbową
+    // Korzystamy z metody std::strtol, która konwertuje cString na long; po próbie konwersji endPtr będzie wskazywać na pierwszy znak z cStr którego nie udało się zamienić na wartość liczbową
     long result = strtol(cStr, &endPtr, 10);
 
     // Sprawdzamy, czy konwersja zakończyła się na znaku Null, co oznacza, że całość string'a została poprawnie zamieniona na int

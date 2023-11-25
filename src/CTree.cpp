@@ -127,6 +127,7 @@ void CTree::enter(const vector<string>& formula) {
 }
 
 double CTree::comp(const vector<string>& args) {
+    // Tworzymy mapę zmiennych, gdzie kluczami są nazwy zmiennych, a wartościami są kolejne liczby z wektora args
     map<string, int> vars;
     for(int i=0; i<varNames->size(); i++){
         vars[(*varNames)[i]] = stringToInt(args[i]);
