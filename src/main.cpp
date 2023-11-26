@@ -5,7 +5,7 @@ using namespace Util;
 using namespace std;
 
 bool cli(const string& command, CTree& drzewo) {
-    // String command z argmuentu zamieniamy na wektor ciągów znaków oddzielonych spacją
+    // String command z argumentu zamieniamy na wektor ciągów znaków oddzielonych spacją
     vector<string> input = splitExpression(command);
 
     // Odczytujemy, a następnie usuwamy z wektora pierwszy string i interpretujemy go jako komendę
@@ -15,6 +15,7 @@ bool cli(const string& command, CTree& drzewo) {
     if(instruction != "exit"){ // Jeśli użytkownik nie chce wyjść z programu, kontynuuj wykonywanie, w innym przypadku FALSE
         if(instruction == "enter"){
 
+            // Jeśli użytkownik nie podał wyrażenia, wypisz błąd
             if(input.empty()){
                 cout << "ERROR: missing arguments." << endl;
             }else{
@@ -23,6 +24,7 @@ bool cli(const string& command, CTree& drzewo) {
 
         }else if(instruction == "comp"){
 
+            // Jeśli użytkownik przekazał mniej argumentów, niż drzewo ma zmiennych, wypisz błąd
             if(input.size() != drzewo.getArgCount()){
                 cout << "ERROR: incorrect number of arguments." << endl;
             }else{
@@ -35,6 +37,7 @@ bool cli(const string& command, CTree& drzewo) {
 
         }else if(instruction == "join"){
 
+            // Jeśli użytkownik nie podał wyrażenia do przyłączenia, wypisz błąd
             if(input.empty()){
                 cout << "ERROR: missing arguments." << endl;
             }else{
