@@ -60,13 +60,17 @@ int main() {
 
     string input;
     CTree drzewo;
+    bool exit = true;
 
     // Kontynuuj odczytywanie wejścia od użytkownika, dopóki metoda 'cli' odpowiedzialna za interpretację komend użytkownika nie zwróci false
     do{
         cout << "CTree>";
         input = "";
         getline(cin, input);
-    }while(cli(input, drzewo));
+        if(!input.empty()){
+             exit = cli(input, drzewo);
+        }
+    }while(exit);
 
 }
 

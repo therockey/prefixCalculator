@@ -37,45 +37,54 @@ double CTree::CNode::getValue(map<string,int>& variables) {
     return 0;
 }
 
-CTree::CNode::CNode(vector<string>* expr, vector<string>* variableNames) {
+CTree::CNode::CNode(vector<string>* expr, vector<string>* variableNames, bool* flag) {
 
-    // Pobieramy następny ciąg znaków i usuwamy go z wektora wyrażenia
-    string eval = expr->back();
-    expr->pop_back();
-
-    // Sprawdzam, czy aktualny ciąg znaków jest liczbą, jeśli jest to przypisz typ 0 do węzła i wartość liczbową z 'eval' to pola value
-    if(isInteger(eval)){
+    if(expr->empty()) // Jeśli w wyrażeniu brakuje argumentów, to ustawiamy domyślny węzeł z wartością 1 i ustawiamy flagę błędu na TRUE;
+    {
         type=0;
-        value = stringToInt(eval);
-    }else if(eval=="+"){ // Jeśli 'eval' to nie liczba, to sprawdź, czy nie jest jedną z możliwych operacji (jeśli tak to przypisz odpowiedni typ do węzła i utwórz odpowiednią liczbę dzieci)
-        type=1;
-        children.push_back(CNode(expr, variableNames));
-        children.push_back(CNode(expr, variableNames));
-    }else if(eval=="-"){
-        type=2;;
-        children.push_back(CNode(expr, variableNames));
-        children.push_back(CNode(expr, variableNames));
-    }else if(eval=="*"){
-        type=3;
-        children.push_back(CNode(expr, variableNames));
-        children.push_back(CNode(expr, variableNames));
-    }else if(eval=="/"){
-        type=4;
-        children.push_back(CNode(expr, variableNames));
-        children.push_back(CNode(expr, variableNames));
-    }else if(eval=="sin"){
-        type=5;
-        children.push_back(CNode(expr, variableNames));
-    }else if(eval=="cos"){
-        type=6;
-        children.push_back(CNode(expr, variableNames));
-    }else{ // Jeśli 'eval' to nie liczba i nie operacja, to potraktuj jako zmienną
-        type=7;
-        varName = eval; // Przechowujemy nazwę zmiennej w Węźle
+        value=1;
+        *flag = true;
 
-        // Sprawdzamy, czy nazwa nie występuje już w wektorze nazw zmiennych; jeśli nie, to go tam dodajemy
-        if(!vectorContains(*variableNames, eval)){
-            variableNames->push_back(eval);
+    }else{
+
+        // Pobieramy następny ciąg znaków i usuwamy go z wektora wyrażenia
+        string eval = expr->back();
+        expr->pop_back();
+
+        // Sprawdzam, czy aktualny ciąg znaków jest liczbą, jeśli jest to przypisz typ 0 do węzła i wartość liczbową z 'eval' to pola value
+        if (isInteger(eval)) {
+            type = 0;
+            value = stringToInt(eval);
+        } else if (eval =="+") { // Jeśli 'eval' to nie liczba, to sprawdź, czy nie jest jedną z możliwych operacji (jeśli tak to przypisz odpowiedni typ do węzła i utwórz odpowiednią liczbę dzieci)
+            type = 1;
+            children.push_back(CNode(expr, variableNames, flag));
+            children.push_back(CNode(expr, variableNames, flag));
+        } else if (eval == "-") {
+            type = 2;;
+            children.push_back(CNode(expr, variableNames, flag));
+            children.push_back(CNode(expr, variableNames, flag));
+        } else if (eval == "*") {
+            type = 3;
+            children.push_back(CNode(expr, variableNames, flag));
+            children.push_back(CNode(expr, variableNames, flag));
+        } else if (eval == "/") {
+            type = 4;
+            children.push_back(CNode(expr, variableNames, flag));
+            children.push_back(CNode(expr, variableNames, flag));
+        } else if (eval == "sin") {
+            type = 5;
+            children.push_back(CNode(expr, variableNames, flag));
+        } else if (eval == "cos") {
+            type = 6;
+            children.push_back(CNode(expr, variableNames, flag));
+        } else { // Jeśli 'eval' to nie liczba i nie operacja, to potraktuj jako zmienną
+            type = 7;
+            varName = eval; // Przechowujemy nazwę zmiennej w Węźle
+
+            // Sprawdzamy, czy nazwa nie występuje już w wektorze nazw zmiennych; jeśli nie, to go tam dodajemy
+            if (!vectorContains(*variableNames, eval)) {
+                variableNames->push_back(eval);
+            }
         }
     }
 }
@@ -121,9 +130,23 @@ void CTree::enter(const vector<string>& formula) {
     // Tworzymy kopię wektora wyrażenia na stercie, aby coraz głębsze węzły mogły pobierać i usuwać następne ciągi znaków z wektora
     vector<string> *expr = new vector<string>;
     *expr = formula;
+    bool* flag = new bool();
+    *flag = false;
 
     // Wywołujemy konstruktor przeciążony dla root'a
-    root = CNode(expr, varNames);
+    root = CNode(expr, varNames, flag);
+
+    if(!expr->empty() && !*flag){
+        cout << "ERROR: excess arguments: ";
+        printVector(*expr);
+        cout << "Parsed the following expression: ";
+        print();
+    }else if(*flag){
+        cout << "ERROR: incorrect expression.\nParsed the following expression: ";
+        print();
+    }
+
+    delete expr;
 }
 
 double CTree::comp(const vector<string>& args) {

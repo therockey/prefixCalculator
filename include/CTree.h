@@ -10,7 +10,7 @@ private:
     class CNode{
         public:
             CNode();
-            CNode(vector<string>* expr, vector<string>* variableNames);
+            CNode(vector<string>* expr, vector<string>* variableNames, bool* flag);
             double getValue(map<string,int>& variables);
             void printBelow();
             void rediscoverVariables(vector<string>* variableNames);

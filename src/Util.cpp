@@ -88,6 +88,5 @@ void Util::printVector(const vector<string>& elements){
     for (int i = 0; i < elements.size(); i++) {
         cout << elements[i] << " ";
     }
-
     cout << endl;
 }
