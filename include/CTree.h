@@ -37,7 +37,8 @@ public:
     void vars();
 
     void operator=(const CTree& other);
-    CTree operator+(const vector<string> &formula);
+    CTree operator+(const vector<string> &formula) const;
+    CTree operator+(const CTree& other) const;
 };
 
 

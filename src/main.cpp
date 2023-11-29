@@ -41,7 +41,9 @@ bool cli(const string& command, CTree& drzewo) {
             if(input.empty()){
                 cout << "ERROR: missing arguments." << endl;
             }else{
-                drzewo = drzewo+input;
+                CTree drzewo2;
+                drzewo2.enter(input);
+                drzewo = drzewo+drzewo2;
             }
 
         }else if(instruction == "print"){

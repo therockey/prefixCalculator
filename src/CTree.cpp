@@ -142,7 +142,7 @@ void CTree::enter(const vector<string>& formula) {
         cout << "Parsed the following expression: ";
         print();
     }else if(*flag){
-        cout << "ERROR: incorrect expression.\nParsed the following expression: ";
+        cout << "ERROR: incorrect expression.\nParsed the following corrected expression: ";
         print();
     }
 
@@ -183,7 +183,7 @@ void CTree::operator=(const CTree &other) {
     *varNames = *other.varNames;
 }
 
-CTree CTree::operator+(const vector<string> &formula) {
+CTree CTree::operator+(const vector<string> &formula) const {
 
     // Tworzymy kopię pierwszego drzewa
     CTree result;
@@ -193,7 +193,13 @@ CTree CTree::operator+(const vector<string> &formula) {
     CTree other;
     other.enter(formula);
 
-    // Zaczynamy poszukiwanie liścia od roota w kopii pierwszego drzewa
+    return result+other;
+}
+
+CTree CTree::operator+(const CTree &other) const {
+    CTree result;
+    result = *this;
+
     CNode* currNode;
     currNode = &result.root;
 
@@ -214,6 +220,3 @@ CTree CTree::operator+(const vector<string> &formula) {
 
     return result;
 }
-
-
-
