@@ -61,10 +61,10 @@ bool cli(const string& command, CTree<T>& drzewo) {
     return false;
 }
 
-int main() {
+template <typename T>
+void loop(CTree<T>& ctree){
 
     string input;
-    CTree<double> drzewo;
     bool exit = true;
 
     // Kontynuuj odczytywanie wejścia od użytkownika, dopóki metoda 'cli' odpowiedzialna za interpretację komend użytkownika nie zwróci false
@@ -73,10 +73,40 @@ int main() {
         input = "";
         getline(cin, input);
         if(!input.empty()){
-             exit = cli(input, drzewo);
+            exit = cli(input, ctree);
         }
     }while(exit);
+}
 
+int main() {
+
+    string input;
+
+    bool check = true;
+    do {
+        cout << "Choose the tree type: " << endl;
+        cout << "1. Int" << endl;
+        cout << "2. Double" << endl;
+        cout << "3. String" << endl;
+        cout << "Choice>";
+        getline(cin, input);
+
+        if(input=="1"){
+            check=false;
+            CTree<int> drzewo;
+            loop(drzewo);
+        }else if(input=="2"){
+            check=false;
+            CTree<double> drzewo;
+            loop(drzewo);
+        }else if(input=="3"){
+            check=false;
+            CTree<string> drzewo;
+            loop(drzewo);
+        }else{
+            cout<<"ERROR: no such option.\n"<<endl;
+        }
+    }while(check);
 }
 
 

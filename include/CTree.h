@@ -7,6 +7,7 @@
 #include <sstream>
 #include <algorithm>
 #include <cmath>
+#include <cstdlib>
 #include "../include/Util.h"
 using namespace std;
 using namespace Util;
@@ -31,6 +32,7 @@ private:
             std::vector<CNode> children;
 
     };
+    static bool isValue(const string& str, T &val);
 
     CNode root;
     vector<string>* varNames;
@@ -47,6 +49,72 @@ public:
     CTree<T> operator+(const vector<string> &formula) const;
     CTree<T> operator+(const CTree<T>& other) const;
 };
+
+template<typename T>
+bool CTree<T>::isValue(const string &str, T &val) {
+    return false;
+}
+
+template<>
+bool CTree<int>::isValue(const string &str, int &val) {
+    // Konwertujemy stringa z argumentu na cString, czyli taki zakończony dodatkowo Null character
+    const char* cStr = str.c_str();
+    char* endPtr;
+
+    // Korzystamy z metody std::strtol, która konwertuje cString na long; po próbie konwersji endPtr będzie wskazywać na pierwszy znak z cStr którego nie udało się zamienić na wartość liczbową
+    long result = strtol(cStr, &endPtr, 10);
+
+    // Sprawdzamy, czy konwersja zakończyła się na znaku Null, co oznacza, że całość string'a została poprawnie zamieniona na int
+    if (endPtr != cStr && *endPtr == '\0') {
+        // Konwersja udana, ustawiamy val na wynik i zwracamy TRUE
+        val = result;
+        return true;
+    }
+    // Konwersja nieudana, ustawiamy val na 0 i zwracamy FALSE
+    val = 0;
+    return false;
+
+}
+
+template<>
+bool CTree<double>::isValue(const string &str, double &val) {
+    // Konwertujemy stringa z argumentu na cString, czyli taki zakończony dodatkowo Null character
+    const char* cStr = str.c_str();
+    char* endPtr;
+
+    // Korzystamy z metody std::strtod, która konwertuje cString na double; po próbie konwersji endPtr będzie wskazywać na pierwszy znak z cStr którego nie udało się zamienić na wartość liczbową
+    double result  = strtod(cStr, &endPtr);
+
+    // Sprawdzamy, czy konwersja zakończyła się na końcu stringa, jeśli tak, to konwersja odbyła się poprawnie
+    if (endPtr == cStr + str.size()) {
+        // Konwersja udana, ustawiamy val na wynik i zwracamy TRUE
+        val = result;
+        return true;
+
+    }
+    // Konwersja nieudana, ustawiamy val na 0 i zwracamy FALSE
+    val = 0;
+    return false;
+}
+
+template<>
+bool CTree<string>::isValue(const std::string &str, string& val) {
+    if(
+            str != "+" &&
+            str != "-" &&
+            str != "*" &&
+            str != "/" &&
+            str != "sin" &&
+            str != "cos" &&
+            str[0] == '\"' &&
+            str[str.length()-1] == '\"'
+            ) {
+        val = str;
+        return true;
+    }
+    val = "";
+    return false;
+}
 
 template <typename T>
 CTree<T>::CTree(){
@@ -69,7 +137,7 @@ CTree<T>::CNode::CNode() : type(), value(){}
 template <typename T>
 T CTree<T>::CNode::getValue(map<string,T>& variables) {
     switch(type){
-        case 0: return value; // Węzeł jest wartością liczbową
+        case 0: return value; // Węzeł jest wartością
         case 1: return children[0].getValue(variables)+children[1].getValue(variables); //Węzeł jest operacją +
         case 2: return children[0].getValue(variables)-children[1].getValue(variables); //Węzeł jest operacją -
         case 3: return children[0].getValue(variables)*children[1].getValue(variables); //Węzeł jest operacją *
@@ -82,23 +150,18 @@ T CTree<T>::CNode::getValue(map<string,T>& variables) {
     return 0;
 }
 
-/*
-template <>
-double CTree<int>::CNode::getValue(map<string,int>& variables) {
-    switch(type){
-        case 0: return value; // Węzeł jest wartością liczbową
+template<>
+string CTree<string>::CNode::getValue(map<std::string,string> &variables) {
+    switch(type) {
+        case 0: return value.substr(1,value.length()-2);; // Węzeł jest wartością
         case 1: return children[0].getValue(variables)+children[1].getValue(variables); //Węzeł jest operacją +
-        case 2: return children[0].getValue(variables)-children[1].getValue(variables); //Węzeł jest operacją -
-        case 3: return children[0].getValue(variables)*children[1].getValue(variables); //Węzeł jest operacją *
-        case 4: return children[0].getValue(variables)/children[1].getValue(variables); //Węzeł jest operacją /
-        case 5: return sin(children[0].getValue(variables)); //Węzeł jest operacją sin
-        case 6: return cos(children[0].getValue(variables)); //Węzeł jest operacją cos
-        case 7: return variables[varName]; // Węzeł jest zmienną
-
+        case 2: return strSub(children[0].getValue(variables),children[1].getValue(variables)); //Węzeł jest operacją -
+        case 3: return strMult(children[0].getValue(variables),children[1].getValue(variables)); //Węzeł jest operacją *
+        case 4: return strDiv(children[0].getValue(variables),children[1].getValue(variables)); //Węzeł jest operacją /
+        case 7: return variables[varName]; //węzeł jest zmienną
     }
-    return 0;
+    return "";
 }
-*/
 
 template <typename T>
 CTree<T>::CNode::CNode(vector<string>* expr, vector<string>* variableNames, bool* flag) {
@@ -115,10 +178,9 @@ CTree<T>::CNode::CNode(vector<string>* expr, vector<string>* variableNames, bool
         string eval = expr->back();
         expr->pop_back();
 
-        // Sprawdzam, czy aktualny ciąg znaków jest liczbą, jeśli jest to przypisz typ 0 do węzła i wartość liczbową z 'eval' to pola value
-        if (isInteger(eval)) {
+        // Sprawdzam, czy aktualny ciąg znaków jest liczbą, jeśli jest, to przypisz typ 0 do węzła i wartość liczbową z 'eval' to pola value
+        if (isValue(eval,value)) {
             type = 0;
-            value = stringToInt(eval);
         } else if (eval =="+") { // Jeśli 'eval' to nie liczba, to sprawdź, czy nie jest jedną z możliwych operacji (jeśli tak to przypisz odpowiedni typ do węzła i utwórz odpowiednią liczbę dzieci)
             type = 1;
             children.push_back(CNode(expr, variableNames, flag));
@@ -200,6 +262,7 @@ void CTree<T>::enter(const vector<string>& formula) {
     *expr = formula;
     bool* flag = new bool();
     *flag = false;
+    varNames->clear();
 
     // Wywołujemy konstruktor przeciążony dla root'a
     root = CNode(expr, varNames, flag);
@@ -222,7 +285,7 @@ T CTree<T>::comp(const vector<string>& args) {
     // Tworzymy mapę zmiennych, gdzie kluczami są nazwy zmiennych, a wartościami są kolejne liczby z wektora args
     map<string, T> vars;
     for(int i=0; i<varNames->size(); i++){
-        vars[(*varNames)[i]] = stringToInt(args[i]);
+        isValue(args[i], vars[(*varNames)[i]]);
     }
     return root.getValue(vars);
 }
@@ -245,14 +308,15 @@ void CTree<T>::vars() {
 template <typename T>
 void CTree<T>::operator=(const CTree<T> &other) {
 
-    root = other.root;
+        root = other.root;
 
-    // Usuwamy dotychczasową listę nazw zmiennych i rezerwujemy miejsce na stercie
-    delete varNames;
-    varNames = new vector<string>;
+        // Usuwamy dotychczasową listę nazw zmiennych i rezerwujemy miejsce na stercie
+        delete varNames;
+        varNames = new vector<string>;
 
-    // Głęboka kopia wartości z wektora znajdującego się pod adresem we wskaźniku other.varNames
-    *varNames = *other.varNames;
+        // Głęboka kopia wartości z wektora znajdującego się pod adresem we wskaźniku other.varNames
+        *varNames = *other.varNames;
+
 }
 
 template <typename T>

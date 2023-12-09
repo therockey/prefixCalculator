@@ -30,35 +30,6 @@ vector<string> Util::splitExpression(const string &expression) {
     return result;
 }
 
-bool Util::isInteger(const string& str) {
-    // Konwertujemy stringa z argumentu na cString, czyli taki zakończony dodatkowo Null character
-    const char* cStr = str.c_str();
-    char* endPtr;
-
-    // Korzystamy z metody std::strtol, która konwertuje cString na long; po próbie konwersji endPtr będzie wskazywać na pierwszy znak cStr którego nie udało się zamienić na wartość liczbową; ostatni argmuent strtol oznacza system liczbowy w którym zapisana jest liczba w cStr
-    long result = strtol(cStr, &endPtr, 10);
-
-    // Sprawdzamy, czy konwersja zakończyła się na znaku Null, co oznacza, że całość string'a została poprawnie zamieniona na int
-    return (endPtr != cStr && *endPtr == '\0');
-}
-
-int Util::stringToInt(const std::string& str) {
-    // Konwertujemy stringa z argumentu na cString, czyli taki zakończony dodatkowo Null character
-    const char* cStr = str.c_str();
-    char* endPtr;
-
-    // Korzystamy z metody std::strtol, która konwertuje cString na long; po próbie konwersji endPtr będzie wskazywać na pierwszy znak z cStr którego nie udało się zamienić na wartość liczbową
-    long result = strtol(cStr, &endPtr, 10);
-
-    // Sprawdzamy, czy konwersja zakończyła się na znaku Null, co oznacza, że całość string'a została poprawnie zamieniona na int
-    if (endPtr != cStr && *endPtr == '\0') {
-        // Konwersja udana, zwracamy przekonwertowaną wartość
-        return result;
-    } else {
-        // Konwersja nieudana, zwracamy wartość domyślną
-        return 0;
-    }
-}
 
 bool Util::mapContains(map<string,int>* variables, const string& key) {
 
@@ -89,4 +60,34 @@ void Util::printVector(const vector<string>& elements){
         cout << elements[i] << " ";
     }
     cout << endl;
+}
+
+string Util::strSub(string first, const string& second){
+    if (first.find(second) == std::string::npos)
+        return first;
+
+    first.erase(first.rfind(second), second.length());
+    return first;
+}
+
+string Util::strMult(const string& first, const string& second) {
+    std::string result;
+    for (int i = 0; i < first.length(); ++i) {
+        if (first[i] == first[0])
+            result += second;
+        else {
+            result += first[i];
+        }
+    }
+    return result;
+}
+
+string Util::strDiv(string first, const string& second){
+    size_t pos;
+
+    while ((pos = first.find(second)) != string::npos) {
+        first.erase(pos, second.length());
+    }
+
+    return first;
 }
