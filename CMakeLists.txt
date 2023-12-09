@@ -6,7 +6,6 @@ set(CMAKE_EXE_LINKER_FLAGS "-static")
 
 add_executable(Lista_3 src/main.cpp
         include/CTree.h
-        src/CTree.cpp
         src/Util.cpp
         include/Util.h)
 

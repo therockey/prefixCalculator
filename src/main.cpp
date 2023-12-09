@@ -4,7 +4,8 @@
 using namespace Util;
 using namespace std;
 
-bool cli(const string& command, CTree& drzewo) {
+template <typename T>
+bool cli(const string& command, CTree<T>& drzewo) {
     // String command z argumentu zamieniamy na wektor ciągów znaków oddzielonych spacją
     vector<string> input = splitExpression(command);
 
@@ -41,7 +42,7 @@ bool cli(const string& command, CTree& drzewo) {
             if(input.empty()){
                 cout << "ERROR: missing arguments." << endl;
             }else{
-                CTree drzewo2;
+                CTree<T> drzewo2;
                 drzewo2.enter(input);
                 drzewo = drzewo+drzewo2;
             }
@@ -60,11 +61,10 @@ bool cli(const string& command, CTree& drzewo) {
     return false;
 }
 
-
 int main() {
 
     string input;
-    CTree drzewo;
+    CTree<double> drzewo;
     bool exit = true;
 
     // Kontynuuj odczytywanie wejścia od użytkownika, dopóki metoda 'cli' odpowiedzialna za interpretację komend użytkownika nie zwróci false
