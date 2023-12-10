@@ -87,7 +87,7 @@ string Util::strDiv(string first, const string& second){
     size_t pos;
 
     while ((pos = first.find(second)) != string::npos) {
-        first.erase(pos, second.length()-1);
+        first.erase(pos+1, second.length()-1);
     }
 
     return first;
