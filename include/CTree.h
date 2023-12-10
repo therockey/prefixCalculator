@@ -153,7 +153,7 @@ T CTree<T>::CNode::getValue(map<string,T>& variables) {
 template<>
 string CTree<string>::CNode::getValue(map<std::string,string> &variables) {
     switch(type) {
-        case 0: return value.substr(1,value.length()-2);; // Węzeł jest wartością
+        case 0: return value.substr(1,value.length()-2); // Węzeł jest wartością
         case 1: return children[0].getValue(variables)+children[1].getValue(variables); //Węzeł jest operacją +
         case 2: return strSub(children[0].getValue(variables),children[1].getValue(variables)); //Węzeł jest operacją -
         case 3: return strMult(children[0].getValue(variables),children[1].getValue(variables)); //Węzeł jest operacją *

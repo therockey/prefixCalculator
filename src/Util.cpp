@@ -72,8 +72,9 @@ string Util::strSub(string first, const string& second){
 
 string Util::strMult(const string& first, const string& second) {
     std::string result;
+    int counter = 0;
     for (int i = 0; i < first.length(); ++i) {
-        if (first[i] == first[0])
+        if (first[i] == second[0])
             result += second;
         else {
             result += first[i];
@@ -86,7 +87,7 @@ string Util::strDiv(string first, const string& second){
     size_t pos;
 
     while ((pos = first.find(second)) != string::npos) {
-        first.erase(pos, second.length());
+        first.erase(pos, second.length()-1);
     }
 
     return first;
