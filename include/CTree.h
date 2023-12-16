@@ -45,7 +45,8 @@ public:
     void print();
     void vars();
 
-    void operator=(const CTree<T>& other);
+    CTree& operator=(const CTree<T>& other);
+    CTree& operator=(CTree<T>&& other) noexcept;
     CTree<T> operator+(const vector<string> &formula) const;
     CTree<T> operator+(const CTree<T>& other) const;
 };
@@ -306,8 +307,8 @@ void CTree<T>::vars() {
 }
 
 template <typename T>
-void CTree<T>::operator=(const CTree<T> &other) {
-
+CTree<T>& CTree<T>::operator=(const CTree<T> &other) {
+    if(this!=&other) {
         root = other.root;
 
         // Usuwamy dotychczasową listę nazw zmiennych i rezerwujemy miejsce na stercie
@@ -316,7 +317,19 @@ void CTree<T>::operator=(const CTree<T> &other) {
 
         // Głęboka kopia wartości z wektora znajdującego się pod adresem we wskaźniku other.varNames
         *varNames = *other.varNames;
+    }
+    return *this;
+}
 
+template <typename T>
+CTree<T>& CTree<T>::operator=(CTree<T>&& other) noexcept {
+    if(this!=&other){
+        root=other.root;
+        delete varNames;
+        varNames=other.varNames;
+        other.varNames=nullptr;
+    }
+    return *this;
 }
 
 template <typename T>
