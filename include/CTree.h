@@ -38,6 +38,8 @@ private:
     vector<string>* varNames;
 public:
     CTree();
+    CTree(const CTree<T>& other);
+    CTree(CTree<T>&& other) noexcept;
     ~CTree();
     int getArgCount();
     void enter(const vector<string>& formula);
@@ -47,8 +49,9 @@ public:
 
     CTree& operator=(const CTree<T>& other);
     CTree& operator=(CTree<T>&& other) noexcept;
-    CTree<T> operator+(const vector<string> &formula) const;
-    CTree<T> operator+(const CTree<T>& other) const;
+    CTree<T> operator+(const CTree<T>& other) const&;
+    CTree<T> operator+(const CTree<T>& other) &&;
+
 };
 
 template<typename T>
@@ -123,6 +126,20 @@ CTree<T>::CTree(){
 }
 
 template <typename T>
+CTree<T>::CTree(const CTree<T>& other){
+    root=other.root;
+    varNames = new vector<string>;
+    *varNames = *other.varNames;
+}
+
+template <typename T>
+CTree<T>::CTree(CTree<T>&& other) noexcept {
+    root=other.root;
+    varNames = other.varNames;
+    other.varNames = nullptr;
+}
+
+template <typename T>
 CTree<T>::~CTree() {
     delete varNames;
 }
@@ -187,7 +204,7 @@ CTree<T>::CNode::CNode(vector<string>* expr, vector<string>* variableNames, bool
             children.push_back(CNode(expr, variableNames, flag));
             children.push_back(CNode(expr, variableNames, flag));
         } else if (eval == "-") {
-            type = 2;;
+            type = 2;
             children.push_back(CNode(expr, variableNames, flag));
             children.push_back(CNode(expr, variableNames, flag));
         } else if (eval == "*") {
@@ -286,7 +303,7 @@ T CTree<T>::comp(const vector<string>& args) {
     // Tworzymy mapę zmiennych, gdzie kluczami są nazwy zmiennych, a wartościami są kolejne liczby z wektora args
     map<string, T> vars;
     for(int i=0; i<varNames->size(); i++){
-        isValue(args[i], vars[(*varNames)[i]]);
+        isValue(args[i], vars[(*varNames)[varNames->size()-i-1]]);
     }
     return root.getValue(vars);
 }
@@ -333,21 +350,7 @@ CTree<T>& CTree<T>::operator=(CTree<T>&& other) noexcept {
 }
 
 template <typename T>
-CTree<T> CTree<T>::operator+(const vector<string> &formula) const {
-
-    // Tworzymy kopię pierwszego drzewa
-    CTree result;
-    result = *this;
-
-    // Tworzymy drugie drzewo
-    CTree other;
-    other.enter(formula);
-
-    return result+other;
-}
-
-template <typename T>
-CTree<T> CTree<T>::operator+(const CTree<T> &other) const {
+CTree<T> CTree<T>::operator+(const CTree<T> &other) const& {
     CTree result;
     result = *this;
 
@@ -369,7 +372,32 @@ CTree<T> CTree<T>::operator+(const CTree<T> &other) const {
     // Odszukujemy na nowo zmienne w drzewie
     result.root.rediscoverVariables(result.varNames);
 
-    return result;
+    return move(result);
+}
+
+template <typename T>
+CTree<T> CTree<T>::operator+(const CTree<T>& other) &&{
+
+    CTree result(move(*this));
+    CNode* currNode;
+    currNode= &result.root;
+
+    // Jeśli znaleźliśmy Node, który nie ma dzieci, to jest to liść
+    while(!currNode->children.empty()){
+        currNode = &currNode->children[0];
+    }
+
+    // Podstawiamy root nowo utworzonego drzewa za liścia pierwszego drzewa
+    *currNode = other.root;
+
+    // Usuwamy dotychczasową listę nazw zmiennych i rezerwujemy miejsce na stercie
+    delete result.varNames;
+    result.varNames = new vector<string>;
+
+    // Odszukujemy na nowo zmienne w drzewie
+    result.root.rediscoverVariables(result.varNames);
+
+    return move(result);
 }
 
 
