@@ -44,6 +44,9 @@ bool cli(const string& command, CTree<T>& drzewo) {
             }else{
                 CTree<T> drzewo2;
                 drzewo2.enter(input);
+                //CTree<T> drzewo3;
+                //drzewo3.enter(splitExpression("+ 2 2"));
+                //drzewo = drzewo+drzewo2+drzewo3;
                 drzewo = drzewo+drzewo2;
             }
 
