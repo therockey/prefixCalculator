@@ -6,7 +6,7 @@
 using namespace std;
 
 vector<string> Util::splitExpression(const string &expression) {
-    vector<std::string> result;
+    vector<string> result;
 
     // Utworzenie strumienia formatującego dane ze stringa
     istringstream iss(expression);
@@ -34,7 +34,7 @@ vector<string> Util::splitExpression(const string &expression) {
 bool Util::mapContains(map<string,int>* variables, const string& key) {
 
     // Sprawdź, czy zmienna "key" występuje w mapie zmiennych
-    map<std::string, int>::iterator it = variables->find(key);
+    map<string, int>::iterator it = variables->find(key);
 
     // Iterator map::find nie zakończył pracy poza końcem mapy, zatem klucz występuje w mapie
     if (it != variables->end()) {
@@ -62,33 +62,54 @@ void Util::printVector(const vector<string>& elements){
     cout << endl;
 }
 
-string Util::strSub(string first, const string& second){
-    if (first.find(second) == std::string::npos)
-        return first;
+// Funkcja usuwająca ostatnie wystąpienie podciągu 'second' z ciągu znaków 'first'.
+string Util::strSub(string first, const string& second) {
+    // Sprawdź, czy podciąg 'second' występuje w ciągu 'first'.
+    if (first.find(second) == string::npos)
+        return first;  // Jeśli nie, zwróć niezmieniony ciąg 'first'.
 
-    first.erase(first.rfind(second), second.length());
+    // Znajdź pozycję ostatniego wystąpienia podciągu 'second' w ciągu 'first'.
+    size_t pos = first.rfind(second);
+
+    // Usuń podciąg 'second' z ciągu 'first', zaczynając od jego ostatniego wystąpienia.
+    first.erase(pos, second.length());
+
+    // Zwróć zmodyfikowany ciąg 'first' po usunięciu ostatniego wystąpienia 'second'.
     return first;
 }
 
+// Funkcja, która dla każdego wystąpienia pierwszego znaku z 'second' w ciągu 'first',
+// wstawia resztę ciągu 'second' za tym znakiem w ciągu wynikowym.
 string Util::strMult(const string& first, const string& second) {
-    std::string result;
-    int counter = 0;
+    // Zmienna do przechowywania wynikowego ciągu.
+    string result;
+
+    // Pętla przechodząca przez każdy znak ciągu 'first'.
     for (int i = 0; i < first.length(); ++i) {
+        // Sprawdź, czy obecny znak w 'first' jest równy pierwszemu znakowi w 'second'.
         if (first[i] == second[0])
-            result += second;
+            result += second;  // Jeśli tak, dodaj cały ciąg 'second' do wynikowego ciągu.
         else {
-            result += first[i];
+            result += first[i];  // Jeśli nie, dodaj obecny znak z 'first' do wynikowego ciągu.
         }
     }
+
+    // Zwróć wynikowy ciąg po przetworzeniu wszystkich znaków w 'first'.
     return result;
 }
 
-string Util::strDiv(string first, const string& second){
+// Funkcja, która odwraca działanie funkcji 'strMult'.
+// Usuwa każde wystąpienie reszty ciągu 'second' po pierwszym znaku z 'second' w ciągu 'first'.
+string Util::strDiv(string first, const string& second) {
     size_t pos;
 
+    // Powtarzaj, dopóki znajdowane są kolejne wystąpienia ciągu 'second' w ciągu 'first'.
     while ((pos = first.find(second)) != string::npos) {
-        first.erase(pos+1, second.length()-1);
+        // Usuń fragment ciągu 'first' zaczynając od pozycji po pierwszym znaku z 'second'
+        // do końca ciągu 'second'.
+        first.erase(pos + 1, second.length() - 1);
     }
 
+    // Zwróć zmodyfikowany ciąg 'first' po usunięciu wszystkich wystąpień ciągu 'second'.
     return first;
 }

@@ -125,17 +125,23 @@ CTree<T>::CTree(){
     varNames = new vector<string>;
 }
 
+// Konstruktor kopiujący
 template <typename T>
 CTree<T>::CTree(const CTree<T>& other){
     root=other.root;
     varNames = new vector<string>;
+
+    // Tworzymy głęboką kopię wartości w wektorze
     *varNames = *other.varNames;
 }
 
+// Konstruktor przenoszący
 template <typename T>
 CTree<T>::CTree(CTree<T>&& other) noexcept {
     root=other.root;
     varNames = other.varNames;
+
+    // Zmieniamy wskaźnik z drugim drzewie, aby jego konstruktor nie zdealokował pamięci przepisanej do drzewa, w którym się znajdujemy
     other.varNames = nullptr;
 }
 
@@ -338,12 +344,20 @@ CTree<T>& CTree<T>::operator=(const CTree<T> &other) {
     return *this;
 }
 
+
+// Operator przypisania dla argumentu będącego wartością tymczasową
 template <typename T>
 CTree<T>& CTree<T>::operator=(CTree<T>&& other) noexcept {
     if(this!=&other){
+
+        // Przepisujemy roota z drugiego drzewa
         root=other.root;
+
+        // Usuwamy dotychczasowy vector nazw zmiennych i przepisujemy go z drugiego drzewa
         delete varNames;
         varNames=other.varNames;
+
+        // Zmieniamy wskaźnik w drugim drzewie tak, aby jego destruktor nie usunął vectora w "this"
         other.varNames=nullptr;
     }
     return *this;
@@ -351,9 +365,11 @@ CTree<T>& CTree<T>::operator=(CTree<T>&& other) noexcept {
 
 template <typename T>
 CTree<T> CTree<T>::operator+(const CTree<T> &other) const& {
-    CTree result;
-    result = *this;
 
+    // Tworzymy drzewo reprezentujące wynik, korzystając z konstruktora kopiującego
+    CTree result(*this);
+
+    // Rozpoczynamy poszukiwanie liścia od roota
     CNode* currNode;
     currNode = &result.root;
 
@@ -372,13 +388,18 @@ CTree<T> CTree<T>::operator+(const CTree<T> &other) const& {
     // Odszukujemy na nowo zmienne w drzewie
     result.root.rediscoverVariables(result.varNames);
 
+    // Zwracamy wynik poprzez wartość
     return move(result);
 }
 
+// Operator dodawania, dla przypadku gdy został wywołany w drzewie będącym wartością tymczasową
 template <typename T>
 CTree<T> CTree<T>::operator+(const CTree<T>& other) &&{
 
+    // Tworzymy drzewo reprezentujące wynik, korzystając z konstruktora przenoszącego, ponieważ funkcja została wywołana w wartości tymczasowej
     CTree result(move(*this));
+
+    // Rozpoczynamy poszukiwanie liścia od roota
     CNode* currNode;
     currNode= &result.root;
 
@@ -397,6 +418,7 @@ CTree<T> CTree<T>::operator+(const CTree<T>& other) &&{
     // Odszukujemy na nowo zmienne w drzewie
     result.root.rediscoverVariables(result.varNames);
 
+    // Zwracamy wynik poprzez wartość
     return move(result);
 }
 
